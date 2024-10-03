@@ -4,6 +4,7 @@ This repository contains an implementation of a logistic regression model that p
 The model aims to differentiate patients into two EF classes: reduced EF (<0.45) and preserved EF (≥0.45), leveraging administrative claims data in scenarios where EF measurements are unavailable.
 
 **Input:** Patient Data Input: Users manually input key patient data, including demographics, diagnoses, and treatment history.
+
 **Prediction:** The model processes the inputs and returns the predicted EF class (reduced or preserved).
 
 **EF Class Prediction:** The model uses logistic regression to classify patients as having either reduced EF or preserved EF.
