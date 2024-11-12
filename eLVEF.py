@@ -70,7 +70,6 @@ st.header("Diagnosis")
 col1, col2 = st.columns(2)
 
 # Define tooltips for diagnosis variables
-# Define updated tooltips for diagnosis variables
 diagnosis_tooltips = {
     "dx_defibrillator": "ICD10-CM: Z45.02, Z95.810, CPT: 33215-33218, 33220, 33223, 33226, 33230-33231, 33240-33241, 33244, 33249, 33262-33264, 93307-93308, 93640-93642, CCSPCS: 7.6.2",
     "hosp_chf": "Count of CHF as primary diagnosis in inpatient stay - 6 months prior to index date",
