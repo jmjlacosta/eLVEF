@@ -10,37 +10,36 @@ app = FastAPI(
 )
 
 class ProbabilityInput(BaseModel):
-    male: bool
-    index_dx_out: bool
+    male: bool 
     age: int = Field(..., ge=0, le=120, description="Age of the patient")
-    dx_defibrillator: bool
-    hosp_chf: bool
-    rx_ace: bool
-    rx_antagonist: bool
-    rx_bblocker: bool
-    rx_digoxin: bool
-    rx_loop_diuretic: bool
-    rx_nitrates: bool
-    rx_thiazide: bool
-    dx_afib: bool
-    dx_anemia: bool
-    dx_cabg: bool
-    dx_cardiomyopathy: bool
-    dx_copd: bool
-    dx_depression: bool
-    dx_htn_nephropathy: bool
-    dx_hyperlipidemia: bool
-    dx_hypertension: bool
-    dx_hypotension: bool
-    dx_mi: bool
-    dx_obesity: bool
-    dx_oth_dysrhythmia: bool
-    dx_psychosis: bool
-    dx_rheumatic_heart: bool
-    dx_sleep_apnea: bool
-    dx_stable_angina: bool
-    dx_valve_disorder: bool
-    hf_type: Literal["Systolic", "Diastolic", "Left", "Unspecified"]
+    dx_defibrillator: bool | None = None
+    hosp_chf: bool | None = None
+    rx_ace: bool | None = None
+    rx_antagonist: bool | None = None
+    rx_bblocker: bool | None = None
+    rx_digoxin: bool | None = None
+    rx_loop_diuretic: bool | None = None
+    rx_nitrates: bool | None = None
+    rx_thiazide: bool | None = None
+    dx_afib: bool | None = None
+    dx_anemia: bool | None = None
+    dx_cabg: bool | None = None
+    dx_cardiomyopathy: bool | None = None
+    dx_copd: bool | None = None
+    dx_depression: bool | None = None
+    dx_htn_nephropathy: bool | None = None
+    dx_hyperlipidemia: bool | None = None
+    dx_hypertension: bool | None = None
+    dx_hypotension: bool | None = None
+    dx_mi: bool | None = None
+    dx_obesity: bool | None = None
+    dx_oth_dysrhythmia: bool | None = None
+    dx_psychosis: bool | None = None
+    dx_rheumatic_heart: bool | None = None
+    dx_sleep_apnea: bool | None = None
+    dx_stable_angina: bool | None = None
+    dx_valve_disorder: bool | None = None
+    hf_type: Literal["Systolic", "Diastolic", "Left", "Unspecified"] | None = "Unspecified"
 
 class ProbabilityOutput(BaseModel):
     probability: float
@@ -53,7 +52,7 @@ def calculate_probability(data: ProbabilityInput) -> ProbabilityOutput:
 
     # Linear predictor calculations based on input values
     LP0 += 0.323651 * data.male
-    LP0 += -0.187191 * data.index_dx_out
+    LP0 += -0.187191
     LP0 += -0.005747 * data.age
     LP0 += 0.275032 * data.dx_defibrillator
     LP0 += 0.346289 * data.hosp_chf
