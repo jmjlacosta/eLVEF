@@ -10,7 +10,7 @@ app = FastAPI(
 )
 
 class ProbabilityInput(BaseModel):
-    male: bool 
+    male: Optional[bool] 
     age: int = Field(..., ge=0, le=120, description="Age of the patient")
     dx_defibrillator: Optional[bool]
     hosp_chf: Optional[bool]
