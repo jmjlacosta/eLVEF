@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import numpy as np
@@ -12,34 +12,34 @@ app = FastAPI(
 class ProbabilityInput(BaseModel):
     male: bool 
     age: int = Field(..., ge=0, le=120, description="Age of the patient")
-    dx_defibrillator: bool | None = None
-    hosp_chf: bool | None = None
-    rx_ace: bool | None = None
-    rx_antagonist: bool | None = None
-    rx_bblocker: bool | None = None
-    rx_digoxin: bool | None = None
-    rx_loop_diuretic: bool | None = None
-    rx_nitrates: bool | None = None
-    rx_thiazide: bool | None = None
-    dx_afib: bool | None = None
-    dx_anemia: bool | None = None
-    dx_cabg: bool | None = None
-    dx_cardiomyopathy: bool | None = None
-    dx_copd: bool | None = None
-    dx_depression: bool | None = None
-    dx_htn_nephropathy: bool | None = None
-    dx_hyperlipidemia: bool | None = None
-    dx_hypertension: bool | None = None
-    dx_hypotension: bool | None = None
-    dx_mi: bool | None = None
-    dx_obesity: bool | None = None
-    dx_oth_dysrhythmia: bool | None = None
-    dx_psychosis: bool | None = None
-    dx_rheumatic_heart: bool | None = None
-    dx_sleep_apnea: bool | None = None
-    dx_stable_angina: bool | None = None
-    dx_valve_disorder: bool | None = None
-    hf_type: Literal["Systolic", "Diastolic", "Left", "Unspecified"] | None = "Unspecified"
+    dx_defibrillator: Optional[bool]
+    hosp_chf: Optional[bool]
+    rx_ace: Optional[bool]
+    rx_antagonist: Optional[bool]
+    rx_bblocker: Optional[bool]
+    rx_digoxin: Optional[bool]
+    rx_loop_diuretic: Optional[bool]
+    rx_nitrates: Optional[bool]
+    rx_thiazide: Optional[bool]
+    dx_afib: Optional[bool]
+    dx_anemia: Optional[bool]
+    dx_cabg: Optional[bool]
+    dx_cardiomyopathy: Optional[bool]
+    dx_copd: Optional[bool]
+    dx_depression: Optional[bool]
+    dx_htn_nephropathy: Optional[bool]
+    dx_hyperlipidemia: Optional[bool]
+    dx_hypertension: Optional[bool]
+    dx_hypotension: Optional[bool]
+    dx_mi: Optional[bool]
+    dx_obesity: Optional[bool]
+    dx_oth_dysrhythmia: Optional[bool]
+    dx_psychosis: Optional[bool]
+    dx_rheumatic_heart: Optional[bool]
+    dx_sleep_apnea: Optional[bool]
+    dx_stable_angina: Optional[bool]
+    dx_valve_disorder: Optional[bool]
+    hf_type: Optional[Literal["Systolic", "Diastolic", "Left", "Unspecified"]]
 
 class ProbabilityOutput(BaseModel):
     probability: float
