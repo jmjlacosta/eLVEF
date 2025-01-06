@@ -1,58 +1,76 @@
-from typing import Literal, Optional
-from fastapi import FastAPI, HTTPException
+from typing import Annotated, Literal, Optional
+from fastapi import FastAPI, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import numpy as np
 
 app = FastAPI(
     title="eLVEF Classification API",
-    description="Predicts the likelihood of Reduced Left Ventricular Ejection Fraction based on diagnosis and medication inputs.",
+    description=(
+        "Predicts the likelihood of Reduced Left Ventricular Ejection Fraction (eLVEF) "
+        "based on patient demographics, diagnoses, and medications."
+    ),
     version="1.0.0",
 )
 
-class ProbabilityInput(BaseModel):
-    male: Optional[bool] = None
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age of the patient")
-    dx_defibrillator: Optional[bool] = None
-    hosp_chf: Optional[bool] = None
-    rx_ace: Optional[bool] = None
-    rx_antagonist: Optional[bool] = None
-    rx_bblocker: Optional[bool] = None
-    rx_digoxin: Optional[bool] = None
-    rx_loop_diuretic: Optional[bool] = None
-    rx_nitrates: Optional[bool] = None
-    rx_thiazide: Optional[bool] = None
-    dx_afib: Optional[bool] = None
-    dx_anemia: Optional[bool] = None
-    dx_cabg: Optional[bool] = None
-    dx_cardiomyopathy: Optional[bool] = None
-    dx_copd: Optional[bool] = None
-    dx_depression: Optional[bool] = None
-    dx_htn_nephropathy: Optional[bool] = None
-    dx_hyperlipidemia: Optional[bool] = None
-    dx_hypertension: Optional[bool] = None
-    dx_hypotension: Optional[bool] = None
-    dx_mi: Optional[bool] = None
-    dx_obesity: Optional[bool] = None
-    dx_oth_dysrhythmia: Optional[bool] = None
-    dx_psychosis: Optional[bool] = None
-    dx_rheumatic_heart: Optional[bool] = None
-    dx_sleep_apnea: Optional[bool] = None
-    dx_stable_angina: Optional[bool] = None
-    dx_valve_disorder: Optional[bool] = None
-    hf_type: Optional[Literal["Systolic", "Diastolic", "Left", "Unspecified"]] = None
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class ProbabilityOutput(BaseModel):
-    probability: float
-    classification: str
+# Input schema
+class ELVEFInput(BaseModel):
+    """Form-based input schema for eLVEF prediction."""
+    male: Optional[bool] = Field(None, description="Gender of the patient (male: True, female: False)")
+    age: Optional[int] = Field(None, ge=0, le=120, description="Age of the patient.")
+    dx_defibrillator: Optional[bool] = Field(None, description="Has a defibrillator diagnosis.")
+    hosp_chf: Optional[bool] = Field(None, description="History of CHF hospitalization.")
+    rx_ace: Optional[bool] = Field(None, description="ACE inhibitors medication usage.")
+    rx_antagonist: Optional[bool] = Field(None, description="Mineralocorticoid receptor antagonist usage.")
+    rx_bblocker: Optional[bool] = Field(None, description="Beta blocker medication usage.")
+    rx_digoxin: Optional[bool] = Field(None, description="Digoxin medication usage.")
+    rx_loop_diuretic: Optional[bool] = Field(None, description="Loop diuretic medication usage.")
+    rx_nitrates: Optional[bool] = Field(None, description="Nitrate medication usage.")
+    rx_thiazide: Optional[bool] = Field(None, description="Thiazide medication usage.")
+    dx_afib: Optional[bool] = Field(None, description="Atrial fibrillation diagnosis.")
+    dx_anemia: Optional[bool] = Field(None, description="Anemia diagnosis.")
+    dx_cabg: Optional[bool] = Field(None, description="CABG surgery history.")
+    dx_cardiomyopathy: Optional[bool] = Field(None, description="Cardiomyopathy diagnosis.")
+    dx_copd: Optional[bool] = Field(None, description="COPD diagnosis.")
+    dx_depression: Optional[bool] = Field(None, description="Depression diagnosis.")
+    dx_htn_nephropathy: Optional[bool] = Field(None, description="Hypertensive nephropathy diagnosis.")
+    dx_hyperlipidemia: Optional[bool] = Field(None, description="Hyperlipidemia diagnosis.")
+    dx_hypertension: Optional[bool] = Field(None, description="Hypertension diagnosis.")
+    dx_hypotension: Optional[bool] = Field(None, description="Hypotension diagnosis.")
+    dx_mi: Optional[bool] = Field(None, description="Myocardial infarction (MI) diagnosis.")
+    dx_obesity: Optional[bool] = Field(None, description="Obesity diagnosis.")
+    dx_oth_dysrhythmia: Optional[bool] = Field(None, description="Other dysrhythmia diagnosis.")
+    dx_psychosis: Optional[bool] = Field(None, description="Psychosis diagnosis.")
+    dx_rheumatic_heart: Optional[bool] = Field(None, description="Rheumatic heart disease diagnosis.")
+    dx_sleep_apnea: Optional[bool] = Field(None, description="Sleep apnea diagnosis.")
+    dx_stable_angina: Optional[bool] = Field(None, description="Stable angina diagnosis.")
+    dx_valve_disorder: Optional[bool] = Field(None, description="Valve disorder diagnosis.")
+    hf_type: Optional[Literal["Systolic", "Diastolic", "Left", "Unspecified"]] = Field(
+        None, description="Type of heart failure diagnosed."
+    )
 
-@app.post("/calculate_probability", response_model=ProbabilityOutput)
-def calculate_probability(data: ProbabilityInput) -> ProbabilityOutput:
+# Output schema
+class ELVEFOutput(BaseModel):
+    """Output schema for eLVEF prediction results."""
+    probability: float = Field(..., description="Probability of reduced ejection fraction.")
+    classification: str = Field(..., description="Classification based on the probability.")
+
+def calculate_linear_predictor(data: ELVEFInput) -> float:
+    """Helper function to calculate the linear predictor."""
     intercept = -1.37218706653502
     LP0 = intercept
 
-    # Handle None values by defaulting to 0 in calculations
+    # Add coefficients for all input features
     LP0 += 0.323651 * (data.male or 0)
-    LP0 += -0.187191
     LP0 += -0.005747 * (data.age or 0)
     LP0 += 0.275032 * (data.dx_defibrillator or 0)
     LP0 += 0.346289 * (data.hosp_chf or 0)
@@ -87,14 +105,33 @@ def calculate_probability(data: ProbabilityInput) -> ProbabilityOutput:
         "Systolic": 0.754954,
         "Diastolic": -0.950856,
         "Left": 0.766415,
-        "Unspecified": -0.577221
+        "Unspecified": -0.577221,
     }
     LP0 += hf_type_mapping.get(data.hf_type, 0)
+
+    return LP0
+
+@app.post(
+    "/calculate_probability/",
+    response_model=ELVEFOutput,
+    summary="Predict eLVEF",
+    description="Calculates the likelihood of reduced ejection fraction and provides classification.",
+)
+def calculate_probability(
+    data: Annotated[ELVEFInput, Form()]
+) -> ELVEFOutput:
+    """Calculate probability and classify eLVEF."""
+    LP0 = calculate_linear_predictor(data)
 
     # Logistic function to calculate probability
     probability = 1 / (1 + np.exp(-LP0))
 
     # Determine classification based on threshold
-    classification = "Reduced Ejection Fraction" if probability > 0.4678 else "Preserved Ejection Fraction"
+    classification = (
+        "Reduced Ejection Fraction" if probability > 0.4678 else "Preserved Ejection Fraction"
+    )
 
-    return ProbabilityOutput(probability=round(probability, 4), classification=classification)
+    return ELVEFOutput(
+        probability=round(probability, 4),
+        classification=classification,
+    )
