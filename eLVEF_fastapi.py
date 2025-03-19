@@ -1,5 +1,5 @@
 from typing import Annotated, Literal
-from fastapi import FastAPI, Form, HTTPException
+from fastapi import FastAPI, Form
 import numpy as np
 
 app = FastAPI(
@@ -10,42 +10,76 @@ app = FastAPI(
 
 @app.post("/calculate_probability")
 def calculate_probability(
-    male: Annotated[bool, Form(...)],
-    index_dx_out: Annotated[bool, Form(...)],
-    age: Annotated[int, Form(..., ge=0, le=120, description="Age of the patient")],
-    dx_defibrillator: Annotated[bool, Form(...)],
-    hosp_chf: Annotated[bool, Form(...)],
-    rx_ace: Annotated[bool, Form(...)],
-    rx_antagonist: Annotated[bool, Form(...)],
-    rx_bblocker: Annotated[bool, Form(...)],
-    rx_digoxin: Annotated[bool, Form(...)],
-    rx_loop_diuretic: Annotated[bool, Form(...)],
-    rx_nitrates: Annotated[bool, Form(...)],
-    rx_thiazide: Annotated[bool, Form(...)],
-    dx_afib: Annotated[bool, Form(...)],
-    dx_anemia: Annotated[bool, Form(...)],
-    dx_cabg: Annotated[bool, Form(...)],
-    dx_cardiomyopathy: Annotated[bool, Form(...)],
-    dx_copd: Annotated[bool, Form(...)],
-    dx_depression: Annotated[bool, Form(...)],
-    dx_htn_nephropathy: Annotated[bool, Form(...)],
-    dx_hyperlipidemia: Annotated[bool, Form(...)],
-    dx_hypertension: Annotated[bool, Form(...)],
-    dx_hypotension: Annotated[bool, Form(...)],
-    dx_mi: Annotated[bool, Form(...)],
-    dx_obesity: Annotated[bool, Form(...)],
-    dx_oth_dysrhythmia: Annotated[bool, Form(...)],
-    dx_psychosis: Annotated[bool, Form(...)],
-    dx_rheumatic_heart: Annotated[bool, Form(...)],
-    dx_sleep_apnea: Annotated[bool, Form(...)],
-    dx_stable_angina: Annotated[bool, Form(...)],
-    dx_valve_disorder: Annotated[bool, Form(...)],
-    hf_type: Annotated[Literal["Systolic", "Diastolic", "Left", "Unspecified"], Form(...)],
+    male: Annotated[Literal["True", "False"], Form(...)] = "False",
+    index_dx_out: Annotated[Literal["True", "False"], Form(...)] = "False",
+    age: Annotated[int, Form(...)] = 0,
+    dx_defibrillator: Annotated[Literal["True", "False"], Form(...)] = "False",
+    hosp_chf: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_ace: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_antagonist: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_bblocker: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_digoxin: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_loop_diuretic: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_nitrates: Annotated[Literal["True", "False"], Form(...)] = "False",
+    rx_thiazide: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_afib: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_anemia: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_cabg: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_cardiomyopathy: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_copd: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_depression: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_htn_nephropathy: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_hyperlipidemia: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_hypertension: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_hypotension: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_mi: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_obesity: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_oth_dysrhythmia: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_psychosis: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_rheumatic_heart: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_sleep_apnea: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_stable_angina: Annotated[Literal["True", "False"], Form(...)] = "False",
+    dx_valve_disorder: Annotated[Literal["True", "False"], Form(...)] = "False",
+    hf_type: Annotated[Literal["Systolic", "Diastolic", "Left", "Unspecified"], Form(...)] = "Unspecified",
 ):
     intercept = -1.37218706653502
     LP0 = intercept
 
-    # Linear predictor calculations based on input values
+    # Convert "True"/"False" strings to 1/0
+    def to_int(value: str) -> int:
+        return 1 if value == "True" else 0
+
+    male = to_int(male)
+    index_dx_out = to_int(index_dx_out)
+    dx_defibrillator = to_int(dx_defibrillator)
+    hosp_chf = to_int(hosp_chf)
+    rx_ace = to_int(rx_ace)
+    rx_antagonist = to_int(rx_antagonist)
+    rx_bblocker = to_int(rx_bblocker)
+    rx_digoxin = to_int(rx_digoxin)
+    rx_loop_diuretic = to_int(rx_loop_diuretic)
+    rx_nitrates = to_int(rx_nitrates)
+    rx_thiazide = to_int(rx_thiazide)
+    dx_afib = to_int(dx_afib)
+    dx_anemia = to_int(dx_anemia)
+    dx_cabg = to_int(dx_cabg)
+    dx_cardiomyopathy = to_int(dx_cardiomyopathy)
+    dx_copd = to_int(dx_copd)
+    dx_depression = to_int(dx_depression)
+    dx_htn_nephropathy = to_int(dx_htn_nephropathy)
+    dx_hyperlipidemia = to_int(dx_hyperlipidemia)
+    dx_hypertension = to_int(dx_hypertension)
+    dx_hypotension = to_int(dx_hypotension)
+    dx_mi = to_int(dx_mi)
+    dx_obesity = to_int(dx_obesity)
+    dx_oth_dysrhythmia = to_int(dx_oth_dysrhythmia)
+    dx_psychosis = to_int(dx_psychosis)
+    dx_rheumatic_heart = to_int(dx_rheumatic_heart)
+    dx_sleep_apnea = to_int(dx_sleep_apnea)
+    dx_stable_angina = to_int(dx_stable_angina)
+    dx_valve_disorder = to_int(dx_valve_disorder)
+
+    # Linear predictor calculations
     LP0 += 0.323651 * male
     LP0 += -0.187191 * index_dx_out
     LP0 += -0.005747 * age
@@ -89,7 +123,7 @@ def calculate_probability(
     # Logistic function to calculate probability
     probability = 1 / (1 + np.exp(-LP0))
 
-    # Determine classification based on threshold
+    # Determine classification
     classification = "Reduced Ejection Fraction" if probability > 0.4678 else "Preserved Ejection Fraction"
 
     return {"probability": round(probability, 4), "classification": classification}
